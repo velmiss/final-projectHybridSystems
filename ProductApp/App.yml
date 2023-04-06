@@ -49,4 +49,4 @@ steps:
     azureSubscription: 'Azure för studenter(21ec1d79-0537-4fec-8e24-5abce860535e)'
     appType: 'webApp'
     WebAppName: 'AA-ProductApp'
-    packageForLinux: '$(Build.ArtifactStagingDirectory)/TodoApp.zip'
+    packageForLinux: '$(Build.ArtifactStagingDirectory)/ProductApp.zip'
