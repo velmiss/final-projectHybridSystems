@@ -1,1 +1,51 @@
-﻿
+﻿# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  paths:
+    include: # Include!
+      - 'ProductApi/*'
+      - 'Product.Models/*'
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+  working-dir: 'ProductApi'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET Core 6'
+  inputs:
+    version: 6.0.x
+ 
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: 'restore'
+    projects: 'ProductApi/*.csproj'
+    feedsToUse: 'select'
+ 
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: 'build'
+    projects: 'ProductApi/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+  
+ 
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ProductApi/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    ArtifactName: productapi
