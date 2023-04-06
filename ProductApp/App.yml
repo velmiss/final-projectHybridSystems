@@ -1,4 +1,7 @@
 ﻿trigger:
+  branches:
+    include:
+    - main
   paths:
     include:
       - 'ProductApp/*'
