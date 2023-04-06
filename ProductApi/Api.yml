@@ -49,3 +49,11 @@ steps:
   displayName: 'Publish Artifact'
   inputs:
     ArtifactName: productapi
+
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Azure för studenter(21ec1d79-0537-4fec-8e24-5abce860535e)'
+    appType: 'apiApp'
+    WebAppName: 'aaProduct-api'
+    packageForLinux: '$(Build.ArtifactStagingDirectory)/ProductApi.zip'
