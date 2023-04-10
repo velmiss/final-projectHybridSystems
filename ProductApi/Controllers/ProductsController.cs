@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -21,32 +22,18 @@ namespace ProductApi.Controllers
         {
             _context = context;
 
-            //check the current users AD role and store it in the string role
-            if (User.IsInRole("admin"))
-            {
-                role = "admin";
-            }
-            else if (User.IsInRole("member"))
-            {
-                role = "member";
-            }
-            else if (User.IsInRole("contributor"))
-            {
-                role = "contributor";
-            }
-            else
-                role = "guest";
+
 
         }
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
+        public async Task<List<ProductDTO>> GetProducts()
         {
           if (_context.Products == null)
           {
-              return NotFound();
-          }
+                return null;
+            }
             return await _context.Products.ToListAsync();
         }
 

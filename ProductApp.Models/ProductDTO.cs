@@ -18,7 +18,6 @@ namespace ProductApp.Models
 
         [Range(0, int.MaxValue)]
         public int AmountInStock { get; set; }
-        [Required]
         public string Distributor { get; set; }
         [Required]
         public string Creator { get; set; }
