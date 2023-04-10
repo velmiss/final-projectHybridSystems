@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using ProductApp.Models;
 using ProductApp.Pages.Products;
@@ -9,6 +10,7 @@ using System.Net.Http.Headers;
 
 namespace ProductApp.Controllers
 {
+    [AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
     public class ProductApi
     {
         private string httpConnect = "https://localhost:7045/api";
@@ -32,7 +34,11 @@ namespace ProductApp.Controllers
                 .GetRequiredService<ITokenAcquisition>();
 
 
-            */    
+            */
+
+            //mTokenAcquisition Should be used to get the token
+            //I think i need to inject it in the constructor
+
             IConfiguration configuration;
             //gett the configuration from appsettings.json and store it in the configuration variable
             configuration = new ConfigurationBuilder()
@@ -63,7 +69,7 @@ namespace ProductApp.Controllers
         //api that connects to https://localhost:7045
         public async Task<List<ProductDTO>> GetProductsAsync()
         {
-            //await PrepareAuthenticatedClient(mApiAccessAsUserScope);
+            await PrepareAuthenticatedClient(mApiAccessAsUserScope);
             products = new List<ProductDTO>();
 
             var responseTask = await mClient.GetAsync($"{mApiBaseAddress}/api/Products");
@@ -93,6 +99,8 @@ namespace ProductApp.Controllers
 
         private async Task PrepareAuthenticatedClient(string ApiScopeToUse)
         {
+            //this returns System.NullReferenceException: 'Object reference not set to an instance of an object.'
+
             var accessToken = await mTokenAcquisition.GetAccessTokenForUserAsync(new[] { ApiScopeToUse });
             Debug.WriteLine($"access token-{accessToken}");
             mClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
