@@ -7,15 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Identity.Web;
 using ProductApp.Controllers;
 using ProductApp.Models;
 
 namespace ProductApp.Pages.Products
 {
-    [Authorize(Policy = "RequireContributerRole")]
-    
-    public class CreateModel : PageModel
+    [Authorize(Policy = "RequireContributorRole")]
+
+	[AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
+
+	public class CreateModel : PageModel
     {
         ProductApi Api;
         public IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> Creators;
@@ -34,11 +37,20 @@ namespace ProductApp.Pages.Products
                 Products = new List<ProductDTO>();
                 Products = await Api.GetProductsAsync();
 
+                //this gets all the creators that already has a product created.
+                ///////////////
                 //store all the creators in a list from Products.Creator to Creators
                 Creators = Products.Select(x => new SelectListItem { Value = x.Creator, Text = x.Creator }).Distinct();
                 //remove all the duplicates in the Creators list
                 Creators = Creators.GroupBy(x => x.Value).Select(x => x.First());
+                //////////////
+                ///
+
+                //save all the registered users in the Creators list
+                // would want to get all the users that exists in the AD and save their ID in the Creators list
                 
+                //Creators = User.FindAll()
+
             }
 
             //return Page();
@@ -53,7 +65,11 @@ namespace ProductApp.Pages.Products
         {
             if (!User.IsInRole("admin"))
             {
-                Product.Creator = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+                //Save the current username as the creator of the product
+                Product.Creator = User.Identity.Name;
+
+
+                //Product.Creator = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
             }
             if (!ModelState.IsValid || Product == null)
             {

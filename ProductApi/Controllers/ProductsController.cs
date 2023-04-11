@@ -10,6 +10,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using ProductApi.Data;
 using ProductApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Identity.Web;
 
 namespace ProductApi.Controllers
 {
@@ -37,7 +46,7 @@ namespace ProductApi.Controllers
             if(!User.IsInRole("admin"))
             {
 				//get all the products where the creator is the same as the user
-				return await _context.Products.Where(x => x.Creator == User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value).ToListAsync();
+				return await _context.Products.Where(x => x.Creator == User.Identity.Name).ToListAsync();
 			}
 			else
             {

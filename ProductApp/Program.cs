@@ -22,8 +22,8 @@ builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = options.DefaultPolicy;
 
     options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("admin"));
-    options.AddPolicy("RequireContributerRole", policy => policy.RequireRole("contributer", "admin"));
-    options.AddPolicy("RequireMemberRole", policy => policy.RequireRole("contributer", "admin", "member"));
+    options.AddPolicy("RequireContributorRole", policy => policy.RequireRole("contributor", "admin"));
+    options.AddPolicy("RequireMemberRole", policy => policy.RequireRole("contributor", "admin", "member"));
 });
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();

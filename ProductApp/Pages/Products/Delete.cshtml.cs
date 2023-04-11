@@ -14,7 +14,9 @@ namespace ProductApp.Pages.Products
 {
     //authorize the user for the role admin
     [Authorize(Policy = "RequireAdminRole")]
-    public class DeleteModel : PageModel
+
+	[AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
+	public class DeleteModel : PageModel
     {
         ProductApi Api;
         public DeleteModel(ILogger<IndexModel> logger, ITokenAcquisition tokenAcquisition, IConfiguration configuration)

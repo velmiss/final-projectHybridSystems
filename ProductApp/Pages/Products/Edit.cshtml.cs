@@ -13,9 +13,11 @@ using ProductApp.Models;
 
 namespace ProductApp.Pages.Products
 {
-    [Authorize(Policy = "RequireContributerRole")]
+    [Authorize(Policy = "RequireContributorRole")]
 
-    public class EditModel : PageModel
+	[AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
+
+	public class EditModel : PageModel
     {
 
         [BindProperty]
@@ -40,6 +42,9 @@ namespace ProductApp.Pages.Products
                 //remove all the duplicates in the Creators list
                 Creators = Creators.GroupBy(x => x.Value).Select(x => x.First());
 
+                //Creators = User.FindAll("http://schemas.microsoft.com/identity/claims/objectidentifier").Select(x => new SelectListItem { Value = x.Value, Text = x.Value }).Distinct();
+
+
             }
             if (id == null)
             {
@@ -58,7 +63,8 @@ namespace ProductApp.Pages.Products
         {
             if (!User.IsInRole("admin"))
             {
-                Product.Creator = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+                Product.Creator = User.Identity.Name;
+                //Product.Creator = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
             }
             if (!ModelState.IsValid|| id == null)
             {

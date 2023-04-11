@@ -29,7 +29,7 @@ namespace ProductApp.Pages.Products
         public async Task OnGetAsync()
         {
 
-            if (User.IsInRole("contributer"))
+            if (User.IsInRole("contributor"))
             {
             }
             //create a new instance of the ProductApi class

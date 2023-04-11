@@ -14,7 +14,9 @@ namespace ProductApp.Pages.Products
 {
     [Authorize(Policy = "RequireMemberRole")]
 
-    public class DetailsModel : PageModel
+	[AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
+
+	public class DetailsModel : PageModel
     {
 
         ProductApi Api;

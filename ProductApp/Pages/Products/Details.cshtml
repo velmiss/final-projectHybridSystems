@@ -43,7 +43,17 @@
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Product?.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
-</div>
+@if(!User.IsInRole("member"))
+{
+    <div>
+        <a asp-page="./Edit" asp-route-id="@Model.Product?.Id">Edit</a> |
+        <a asp-page="./Index">Back to List</a>
+    </div>
+}
+else
+{
+    <div>
+        <a asp-page="./Index">Back to List</a>
+    </div>
+}
+
