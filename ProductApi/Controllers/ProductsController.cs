@@ -31,7 +31,7 @@ namespace ProductApi.Controllers
         }
 
         // GET: api/Products
-        [HttpGet]
+        [HttpGet(Name = "GetProducts")]
         public async Task<List<ProductDTO>> GetProducts()
         {
           if (_context.Products == null)

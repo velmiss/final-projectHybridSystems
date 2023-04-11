@@ -1,4 +1,5 @@
 ﻿using Azure;
+using MessagePack.Formatters;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using ProductApp.Models;
@@ -7,13 +8,14 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ProductApp.Controllers
 {
     [AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
+
     public class ProductApi
     {
-        private string httpConnect = "https://localhost:7045/api";
         private HttpClient mClient;
 
         public List<ProductDTO> products { get; set; } = default!;
@@ -21,32 +23,16 @@ namespace ProductApp.Controllers
         private readonly string mApiScopes = string.Empty;
         private readonly string mApiAccessAsUserScope = string.Empty;
         private readonly string mApiBaseAddress = string.Empty;
-        private readonly ITokenAcquisition mTokenAcquisition;
+        private ITokenAcquisition mTokenAcquisition;
 
         private readonly ILogger<IndexModel> _logger;
 
-        public ProductApi()
+        public ProductApi(ILogger<IndexModel> logger, ITokenAcquisition tokenAcquisition, IConfiguration configuration)
         {
-            /*
-            ILogger<IndexModel> logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<IndexModel>>();
 
-            ITokenAcquisition tokenAcquisition = builder.Services.BuildServiceProvider()
-                .GetRequiredService<ITokenAcquisition>();
+            _logger = logger;
+            mTokenAcquisition = tokenAcquisition;
 
-
-            */
-
-            //mTokenAcquisition Should be used to get the token
-            //I think i need to inject it in the constructor
-
-            IConfiguration configuration;
-            //gett the configuration from appsettings.json and store it in the configuration variable
-            configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-                .AddEnvironmentVariables()
-                .Build();
             
             mClient = new HttpClient();
             mClient.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -62,11 +48,9 @@ namespace ProductApp.Controllers
             //Add Novia hybrid in appsettings.json!
             //
             
-            // We need to initialize every time, stateless calls
-            //products = new List<ProductDTO>();
+            
         }
 
-        //api that connects to https://localhost:7045
         public async Task<List<ProductDTO>> GetProductsAsync()
         {
             await PrepareAuthenticatedClient(mApiAccessAsUserScope);
@@ -94,13 +78,78 @@ namespace ProductApp.Controllers
             return products;
         }
 
+        public async Task<ProductDTO> GetProductAsync(long id)
+        {
+            await PrepareAuthenticatedClient(mApiAccessAsUserScope);
+            ProductDTO product = new ProductDTO();
 
+            var responseTask = await mClient.GetAsync($"{mApiBaseAddress}/api/Products/{id}");
+            if (responseTask.StatusCode == HttpStatusCode.OK)
+            {
+                var readTask = await responseTask.Content.ReadFromJsonAsync<ProductDTO>();
+                if (readTask == null)
+                {
+                    product = new ProductDTO();
+                }
+                product = readTask;
+            }
+            else //web api sent error response 
+            {
+                //log response status here..
 
+                product = new ProductDTO();
 
+            }
+            return product;
+        }
+
+        public async Task<bool> PostProduct(ProductDTO product)
+        {
+            await PrepareAuthenticatedClient(mApiAccessAsUserScope);
+            var responseTask = await mClient.PostAsJsonAsync($"{mApiBaseAddress}/api/Products/", product);
+            if (responseTask.StatusCode == HttpStatusCode.Created)
+            {
+                return true;
+                //log response status here..
+            }
+            else //web api sent error response 
+            {
+                return false;
+                //log response status here..
+            }
+        }
+        
+        public async Task<bool> UpdateProduct(long id, ProductDTO product)
+        {
+            await PrepareAuthenticatedClient(mApiAccessAsUserScope);
+            var responseTask = await mClient.PutAsJsonAsync($"{mApiBaseAddress}/api/Products/"+ id , product);
+            if(responseTask.StatusCode == HttpStatusCode.OK)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public async Task<bool> DeleteProduct(long id)
+        {
+            await PrepareAuthenticatedClient(mApiAccessAsUserScope);
+            var responseTask = await mClient.DeleteAsync($"{mApiBaseAddress}/api/Products/"+id);
+            if (responseTask.StatusCode == HttpStatusCode.OK)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+            
         private async Task PrepareAuthenticatedClient(string ApiScopeToUse)
         {
             //this returns System.NullReferenceException: 'Object reference not set to an instance of an object.'
-
+            
             var accessToken = await mTokenAcquisition.GetAccessTokenForUserAsync(new[] { ApiScopeToUse });
             Debug.WriteLine($"access token-{accessToken}");
             mClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);

@@ -5,13 +5,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Identity.Web;
+using ProductApp.Controllers;
 using ProductApp.Models;
 
 namespace ProductApp.Pages.Products
 {
     public class CreateModel : PageModel
     {
-       
+        ProductApi Api;
+        public CreateModel(ILogger<IndexModel> logger, ITokenAcquisition tokenAcquisition, IConfiguration configuration) 
+        {
+            Api = new ProductApi(logger, tokenAcquisition, configuration);
+        }
         public IActionResult OnGet()
         {
             return Page();
@@ -27,6 +33,10 @@ namespace ProductApp.Pages.Products
           if (!ModelState.IsValid || Product == null)
             {
                 return Page();
+            }
+            else
+            {
+                await Api.PostProduct(Product);
             }
 
            
