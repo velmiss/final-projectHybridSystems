@@ -1,6 +1,7 @@
 ﻿using Azure;
 using MessagePack.Formatters;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web;
 using ProductApp.Models;
 using ProductApp.Pages.Products;
@@ -9,11 +10,19 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using static System.Formats.Asn1.AsnWriter;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductApp.Controllers
 {
     [AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
-
+    [Authorize]
     public class ProductApi
     {
         private HttpClient mClient;
@@ -37,18 +46,12 @@ namespace ProductApp.Controllers
             mClient = new HttpClient();
             mClient.DefaultRequestHeaders.Add("Accept", "application/json");
             mClient.DefaultRequestHeaders.Add("User-Agent", "ProductApp");
-
-            //_logger = logger;
+            
             mClient = new HttpClient();
-            //mTokenAcquisition = tokenAcquisition;
             mApiScopes = configuration["NoviaHybrid:ApiScopes"];
             mApiAccessAsUserScope = mApiScopes.Split(' ').Where(instring => instring.Contains("access_as_user")).First();
             mApiBaseAddress = configuration["NoviaHybrid:ApiBaseAddress"];
-            //
-            //Add Novia hybrid in appsettings.json!
-            //
-            
-            
+
         }
 
         public async Task<List<ProductDTO>> GetProductsAsync()
@@ -105,6 +108,7 @@ namespace ProductApp.Controllers
 
         public async Task<bool> PostProduct(ProductDTO product)
         {
+
             await PrepareAuthenticatedClient(mApiAccessAsUserScope);
             var responseTask = await mClient.PostAsJsonAsync($"{mApiBaseAddress}/api/Products/", product);
             if (responseTask.StatusCode == HttpStatusCode.Created)

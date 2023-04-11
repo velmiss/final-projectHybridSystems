@@ -20,6 +20,10 @@ builder.Services.AddAuthorization(options =>
 {
     // By default, all incoming requests will be authorized according to the default policy.
     options.FallbackPolicy = options.DefaultPolicy;
+
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("admin"));
+    options.AddPolicy("RequireContributerRole", policy => policy.RequireRole("contributer", "admin"));
+    options.AddPolicy("RequireMemberRole", policy => policy.RequireRole("contributer", "admin", "member"));
 });
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();

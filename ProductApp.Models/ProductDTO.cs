@@ -19,7 +19,7 @@ namespace ProductApp.Models
         [Range(0, int.MaxValue)]
         public int AmountInStock { get; set; }
         public string Distributor { get; set; }
-        [Required]
+        //[Required]
         public string Creator { get; set; }
     }
 }

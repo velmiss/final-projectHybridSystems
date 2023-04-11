@@ -34,11 +34,19 @@ namespace ProductApi.Controllers
         [HttpGet(Name = "GetProducts")]
         public async Task<List<ProductDTO>> GetProducts()
         {
-          if (_context.Products == null)
-          {
-                return null;
+            if(!User.IsInRole("admin"))
+            {
+				//get all the products where the creator is the same as the user
+				return await _context.Products.Where(x => x.Creator == User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value).ToListAsync();
+			}
+			else
+            {
+                if (_context.Products == null)
+                {
+                    return null;
+                }
+                return await _context.Products.ToListAsync();
             }
-            return await _context.Products.ToListAsync();
         }
 
         // GET: api/Products/5
@@ -93,16 +101,30 @@ namespace ProductApi.Controllers
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ProductDTO>> PostProductDTO(ProductDTO productDTO)
+        public async Task<ActionResult<ProductDTO>> PostProductDTO(ProductDTO product)
         {
-          if (_context.Products == null)
-          {
-              return Problem("Entity set 'ProductDBContext.Products'  is null.");
-          }
-            _context.Products.Add(productDTO);
+            if (_context.Products == null)
+            {
+                return Problem("Entity set 'ProductDBContext.Products'  is null.");
+            }
+
+
+            //if the user logged in is not an admin
+            if (!User.IsInRole("admin"))
+            {
+                var id = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+                //set the product to be owned by the current user
+                if (product.Creator != id) {
+                    //return an error
+                    return Problem("You are not authorized to create a product for another user.");
+                }
+                product.Creator = id;
+            }
+
+            _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProductDTO", new { id = productDTO.Id }, productDTO);
+            return CreatedAtAction("GetProductDTO", new { id = product.Id }, product);
         }
 
         // DELETE: api/Products/5

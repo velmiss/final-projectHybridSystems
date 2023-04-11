@@ -13,7 +13,7 @@ using ProductApp.Models;
 
 namespace ProductApp.Pages.Products
 {
-    [Authorize]
+    [Authorize(Policy = "RequireMemberRole")]
     [AuthorizeForScopes(ScopeKeySection = "NoviaHybrid:ApiScopes")]
     public class IndexModel : PageModel
     {
@@ -28,8 +28,10 @@ namespace ProductApp.Pages.Products
 
         public async Task OnGetAsync()
         {
-        
 
+            if (User.IsInRole("contributer"))
+            {
+            }
             //create a new instance of the ProductApi class
 
             //create a new empty list of products
