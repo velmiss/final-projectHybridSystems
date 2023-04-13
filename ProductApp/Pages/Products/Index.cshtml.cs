@@ -29,11 +29,6 @@ namespace ProductApp.Pages.Products
         public async Task OnGetAsync()
         {
 
-            if (User.IsInRole("contributor"))
-            {
-            }
-            //create a new instance of the ProductApi class
-
             //create a new empty list of products
             Products = new List<ProductDTO>();
             Products = await Api.GetProductsAsync();

@@ -122,7 +122,9 @@ namespace ProductApp.Controllers
                 //log response status here..
             }
         }
+       
         
+
         public async Task<bool> UpdateProduct(long id, ProductDTO product)
         {
             await PrepareAuthenticatedClient(mApiAccessAsUserScope);
