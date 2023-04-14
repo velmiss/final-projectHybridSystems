@@ -18,6 +18,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
+using NuGet.Common;
+using Azure.Identity;
+using Azure.Core;
+using System.Diagnostics.Metrics;
 
 namespace ProductApp.Controllers
 {
@@ -33,8 +38,9 @@ namespace ProductApp.Controllers
         private readonly string mApiAccessAsUserScope = string.Empty;
         private readonly string mApiBaseAddress = string.Empty;
         private ITokenAcquisition mTokenAcquisition;
-
+        private IConfiguration mConfiguration;
         private readonly ILogger<IndexModel> _logger;
+        private string token;
 
         public ProductApi(ILogger<IndexModel> logger, ITokenAcquisition tokenAcquisition, IConfiguration configuration)
         {
@@ -51,7 +57,8 @@ namespace ProductApp.Controllers
             mApiScopes = configuration["NoviaHybrid:ApiScopes"];
             mApiAccessAsUserScope = mApiScopes.Split(' ').Where(instring => instring.Contains("access_as_user")).First();
             mApiBaseAddress = configuration["NoviaHybrid:ApiBaseAddress"];
-
+            mConfiguration = configuration;
+            
         }
 
         public async Task<List<ProductDTO>> GetProductsAsync()
@@ -151,6 +158,46 @@ namespace ProductApp.Controllers
                 return false;
             }
         }
+
+        //get Creators from Azure AD group Product method should recive the User that is currently logged in
+        public async Task<List<string>> GetCreators(System.Security.Claims.ClaimsPrincipal user)
+        {
+            List<string> creators = new List<string>();
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            // Multi-tenant apps can use "common",
+            // single-tenant apps must use the tenant ID from the Azure portal
+            var tenantId = mConfiguration["AzureAd:TenantId"];
+
+            // Values from app registration
+            //get the client id and client secret from appsettings.json
+            var clientId = mConfiguration["AzureAd:ClientId"];
+            var clientSecret = mConfiguration["AzureAd:ClientSecret"];
+
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+            
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+            var members = await graphClient.Groups["7e3728b6-e968-4695-a517-9e7d070848a7"].Members.GraphUser.GetAsync();
+            string name="";
+            foreach (var member in members.Value)
+            {
+
+                creators.Add(member.UserPrincipalName);
+            }
+            
+
+            return creators;
+        }
             
         private async Task PrepareAuthenticatedClient(string ApiScopeToUse)
         {
@@ -158,6 +205,7 @@ namespace ProductApp.Controllers
             
             var accessToken = await mTokenAcquisition.GetAccessTokenForUserAsync(new[] { ApiScopeToUse });
             Debug.WriteLine($"access token-{accessToken}");
+            token = accessToken;
             mClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             mClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }

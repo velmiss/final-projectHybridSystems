@@ -7,9 +7,6 @@ using Microsoft.Identity.Web.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
-using Microsoft.Graph;
-using Microsoft.Graph.Auth;
-using Microsoft.Identity.Client;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,14 +31,7 @@ builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
 var app = builder.Build();
 
-ClientCredentialProvider authenticationProvider = new ClientCredentialProvider(confidentialClientApplication);
 
-GraphServiceClient graphServiceClient = new GraphServiceClient(authenticationProvider);
-var result = graphServiceClient.Users.Request().GetAsync();
-foreach (var item in result.Result)
-{
-    Console.WriteLine(item.DisplayName);
-}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

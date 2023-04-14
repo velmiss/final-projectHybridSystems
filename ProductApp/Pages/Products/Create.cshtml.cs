@@ -28,29 +28,14 @@ namespace ProductApp.Pages.Products
         public CreateModel(ILogger<IndexModel> logger, ITokenAcquisition tokenAcquisition, IConfiguration configuration) 
         {
             Api = new ProductApi(logger, tokenAcquisition, configuration);
-            
+
         }
         public async Task OnGet()
         {
             if (User.IsInRole("admin"))
             {
-                Products = new List<ProductDTO>();
-                Products = await Api.GetProductsAsync();
-
-                //this gets all the creators that already has a product created.
-                ///////////////
-                //store all the creators in a list from Products.Creator to Creators
-                Creators = Products.Select(x => new SelectListItem { Value = x.Creator, Text = x.Creator }).Distinct();
-                //remove all the duplicates in the Creators list
-                Creators = Creators.GroupBy(x => x.Value).Select(x => x.First());
-                //////////////
-                ///
-
-                //save all the registered users in the Creators list
-                // would want to get all the users that exists in the AD and save their ID in the Creators list
-                
-                //Creators = User.FindAll()
-
+                //convert from a list from Api.GetCreators() to a IEnumerable<SelectListItem> that is stored in Creators
+                Creators = (await Api.GetCreators(User)).Select(x => new SelectListItem(x, x));
             }
 
             //return Page();
@@ -66,7 +51,7 @@ namespace ProductApp.Pages.Products
             if (!User.IsInRole("admin"))
             {
                 //Save the current username as the creator of the product
-                Product.Creator = User.Identity.Name;
+                Product.Creator = User.GetDisplayName();
 
 
                 //Product.Creator = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
