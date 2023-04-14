@@ -10,16 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using ProductApi.Data;
 using ProductApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Identity.Web;
-using NuGet.Protocol;
 
 namespace ProductApi.Controllers
 {
