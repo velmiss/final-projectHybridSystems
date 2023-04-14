@@ -30,9 +30,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.Products[0].Distributor)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Products[0].Creator)
-            </th>
+            @if (User.IsInRole("admin"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Products[0].Creator)
+                </th>
+            }
             <th></th>
         </tr>
     </thead>
@@ -54,9 +57,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Distributor)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Creator)
-            </td>
+            @if (User.IsInRole("admin"))
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Creator)
+                </td>
+            }
 
             @if (User.IsInRole("admin"))
             {

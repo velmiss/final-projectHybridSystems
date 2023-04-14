@@ -6,6 +6,8 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,8 +29,9 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
-
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

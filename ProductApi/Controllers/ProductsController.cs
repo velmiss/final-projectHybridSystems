@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Identity.Web;
+using NuGet.Protocol;
 
 namespace ProductApi.Controllers
 {
@@ -45,8 +46,10 @@ namespace ProductApi.Controllers
         {
             if(!User.IsInRole("admin"))
             {
-				//get all the products where the creator is the same as the user
-				return await _context.Products.Where(x => x.Creator == User.Identity.Name).ToListAsync();
+                // get the username of the user and store it in id
+                var id = User.GetDisplayName();
+                //get all the products where the creator is the same as the user
+                return await _context.Products.Where(x => x.Creator == User.GetDisplayName()).ToListAsync();
 			}
 			else
             {
@@ -121,7 +124,8 @@ namespace ProductApi.Controllers
             //if the user logged in is not an admin
             if (!User.IsInRole("admin"))
             {
-                var id = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+                //var id = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
+                var id = User.GetDisplayName();
                 //set the product to be owned by the current user
                 if (product.Creator != id) {
                     //return an error

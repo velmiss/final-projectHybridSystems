@@ -13,6 +13,8 @@ using System.Security.Claims;
 
 namespace ProductApp.Pages
 {
+    //set this page as a landing page for the app requiring no authentication
+    [AllowAnonymous]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
@@ -25,7 +27,7 @@ namespace ProductApp.Pages
         public void OnGet()
         {
             //get the id of the user logged in with an azure AD account
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         }
     }
 }

@@ -37,13 +37,8 @@ namespace ProductApp.Pages.Products
                 Products = new List<ProductDTO>();
                 Products = await Api.GetProductsAsync();
 
-                //store all the creators in a list from Products.Creator to Creators
-                Creators = Products.Select(x => new SelectListItem { Value = x.Creator, Text = x.Creator }).Distinct();
-                //remove all the duplicates in the Creators list
-                Creators = Creators.GroupBy(x => x.Value).Select(x => x.First());
-
-                //Creators = User.FindAll("http://schemas.microsoft.com/identity/claims/objectidentifier").Select(x => new SelectListItem { Value = x.Value, Text = x.Value }).Distinct();
-
+                //convert from a list from Api.GetCreators() to a IEnumerable<SelectListItem> that is stored in Creators
+                Creators = (await Api.GetCreators(User)).Select(x => new SelectListItem(x, x));
 
             }
             if (id == null)
