@@ -147,20 +147,10 @@ namespace ProductApp.Controllers
         public async Task<List<string>> GetCreators(System.Security.Claims.ClaimsPrincipal user)
         {
             List<string> creators = new List<string>();
-
             var scopes = new[] { "https://graph.microsoft.com/.default" };
-
-            // Multi-tenant apps can use "common",
-            // single-tenant apps must use the tenant ID from the Azure portal
             var tenantId = mConfiguration["AzureAd:TenantId"];
-
-            // Values from app registration
-            //get the client id and client secret from appsettings.json
             var clientId = mConfiguration["AzureAd:ClientId"];
             var clientSecret = mConfiguration["AzureAd:ClientSecret"];
-
-
-            // using Azure.Identity;
             var options = new TokenCredentialOptions
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
@@ -172,14 +162,12 @@ namespace ProductApp.Controllers
             var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
 
             var members = await graphClient.Groups["7e3728b6-e968-4695-a517-9e7d070848a7"].Members.GraphUser.GetAsync();
-            string name="";
+
             foreach (var member in members.Value)
             {
 
                 creators.Add(member.UserPrincipalName);
             }
-            
-
             return creators;
         }
             
