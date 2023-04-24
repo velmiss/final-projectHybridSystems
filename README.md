@@ -1,5 +1,5 @@
 # Introduction 
-Inlämningsuppgift Till hybrida system
+Hybrid system Course work
 
 # Linkar
 Web APP : https://aa-productapp.azurewebsites.net/
@@ -9,4 +9,4 @@ Web API : https://aaproduct-api.azurewebsites.net/
 | Username									| Password			|
 |-------------------------------------------|-------------------|
 
-Problem med autentikeringen av test users i Azure AD? kanske kan ta av två faktor autentikeringen i Azure AD för att testa.
+To get username talk to admin
